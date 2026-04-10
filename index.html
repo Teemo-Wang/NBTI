@@ -22,6 +22,7 @@ h1{font-size:clamp(2.5rem,10vw,5.5rem);font-weight:900;background:linear-gradien
 .opts{display:flex;flex-direction:column;gap:12px}
 .ob{width:100%;padding:16px 20px;font-size:1rem;color:#ddd;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;cursor:pointer;transition:all .2s;text-align:left;line-height:1.5;font-family:inherit}
 .ob:hover{background:rgba(255,107,107,.12);border-color:#ff6b6b;color:#fff;transform:translateX(4px)}
+.ob.sel{background:rgba(255,107,107,.18);border-color:#ff6b6b;color:#fff;pointer-events:none}
 .back{display:inline-block;margin-top:20px;padding:10px 24px;font-size:.85rem;color:#666;background:none;border:1px solid rgba(255,255,255,.1);border-radius:30px;cursor:pointer;font-family:inherit;transition:all .2s}.back:hover{color:#ff6b6b;border-color:#ff6b6b}
 #result{padding:40px 20px;max-width:640px;width:100%;margin:0 auto;justify-content:flex-start;padding-top:40px}
 .rc{background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:36px 28px;text-align:center;margin-bottom:24px}
@@ -166,11 +167,14 @@ window.scrollTo(0,0);
 document.getElementById("backBtn").style.display=cur>0?"inline-block":"none";
 }
 function pick(i){
+var btns=document.getElementById("qo").children;
+for(var j=0;j<btns.length;j++)btns[j].classList.remove("sel");
+btns[i].classList.add("sel");
 var d=QS[cur].o[i].d;
 ans.push({idx:cur,d:d});
 for(var k in d)scores[k]=(scores[k]||0)+d[k];
 cur++;
-if(cur>=30)finish();else render();
+setTimeout(function(){if(cur>=30)finish();else render();},300);
 }
 function finish(){
 document.getElementById("pb").style.width="100%";
