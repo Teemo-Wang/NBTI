@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NBTI 人格测试</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'PingFang SC',sans-serif;background:#0a0a0a;color:#e0e0e0;min-height:100vh;overflow-x:hidden}
+.page{display:none;min-height:100vh}.page.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
+#landing{text-align:center;padding:40px 20px;background:radial-gradient(ellipse at center,#1a1a2e,#0a0a0a 70%)}
+h1{font-size:clamp(2.5rem,10vw,5.5rem);font-weight:900;background:linear-gradient(135deg,#ff6b6b,#ffa500,#ff6b6b);background-size:200% 200%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:g 3s ease infinite;letter-spacing:6px}
+@keyframes g{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.sub{font-size:clamp(.9rem,3vw,1.3rem);color:#888;margin:8px 0 48px}.sub span{color:#ff6b6b}
+.btn{padding:16px 56px;font-size:1.15rem;font-weight:700;color:#fff;background:linear-gradient(135deg,#ff6b6b,#ee5a24);border:none;border-radius:50px;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 24px rgba(255,107,107,.3);font-family:inherit}
+.btn:hover{transform:scale(1.05)}.btn:active{transform:scale(.97)}
+.credit{margin-top:48px;font-size:.78rem;color:#555;line-height:2}
+.pbar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,#ff6b6b,#ffa500);transition:width .4s;z-index:100;width:0}
+#quiz{padding:20px;max-width:640px;width:100%;margin:0 auto;justify-content:flex-start;padding-top:60px}
+.qc{font-size:.85rem;color:#666;margin-bottom:8px;text-align:center}.qc b{color:#ff6b6b}
+.qt{font-size:clamp(1.1rem,4vw,1.45rem);font-weight:700;text-align:center;margin-bottom:32px;line-height:1.7;min-height:3em}
+.opts{display:flex;flex-direction:column;gap:12px}
+.ob{width:100%;padding:16px 20px;font-size:1rem;color:#ddd;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;cursor:pointer;transition:all .2s;text-align:left;line-height:1.5;font-family:inherit}
+.ob:hover{background:rgba(255,107,107,.12);border-color:#ff6b6b;color:#fff;transform:translateX(4px)}
+.back{display:inline-block;margin-top:20px;padding:10px 24px;font-size:.85rem;color:#666;background:none;border:1px solid rgba(255,255,255,.1);border-radius:30px;cursor:pointer;font-family:inherit;transition:all .2s}.back:hover{color:#ff6b6b;border-color:#ff6b6b}
+#result{padding:40px 20px;max-width:640px;width:100%;margin:0 auto;justify-content:flex-start;padding-top:40px}
+.rc{background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:36px 28px;text-align:center;margin-bottom:24px}
+.re{font-size:4rem;margin-bottom:12px}.rtl{font-size:.85rem;color:#888;margin-bottom:4px}
+.rt{font-size:2.2rem;font-weight:900;background:linear-gradient(135deg,#ff6b6b,#ffa500);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.rn{font-size:1.1rem;color:#ccc;margin-bottom:16px}
+.mb{width:80%;margin:0 auto 8px;height:8px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden}
+.mf{height:100%;background:linear-gradient(90deg,#ff6b6b,#ffa500);border-radius:4px;transition:width 1.5s}
+.mt{font-size:.85rem;color:#888;margin-bottom:24px}
+.rd{font-size:.95rem;color:#bbb;line-height:1.9;text-align:left}
+.dims{margin-top:24px}.dims h3{font-size:.9rem;color:#999;margin-bottom:16px;text-align:center}
+.dr{display:flex;align-items:center;margin-bottom:10px;font-size:.82rem}
+.dl{width:72px;color:#999;flex-shrink:0;text-align:right;padding-right:10px}
+.db{flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.df{height:100%;border-radius:3px;transition:width 1.2s}
+.dv{width:36px;text-align:right;color:#888;padding-left:8px}
+.tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:20px}
+.tag{padding:6px 14px;border-radius:20px;font-size:.78rem;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.2);color:#ff8a80}
+</style>
+</head>
+<body>
+<div class="pbar" id="pb"></div>
+<div class="page active" id="landing">
+<h1>NBTI</h1>
+<p class="sub">MBTI 测性格，<span>NBTI 测的是你骨子里的「内味儿」</span></p>
+<button class="btn" id="startBtn">开始测试</button>
+<div class="credit">作者：Teemo<br>灵感来源：SBTI · 纯属娱乐<br>别拿结果当真，但你可以拿去发朋友圈</div>
+</div>
+<div class="page" id="quiz">
+<div class="qc"><b id="qn">1</b> / 30</div>
+<div class="qt" id="qtx"></div>
+<div class="opts" id="qo"></div>
+<button class="back" id="backBtn" style="display:none">← 上一题</button>
+</div>
+<div class="page" id="result">
+<div class="rc">
+<div class="re" id="rE"></div>
+<div class="rtl">你的 NBTI 人格</div>
+<div class="rt" id="rT"></div>
+<div class="rn" id="rN"></div>
+<div class="mb"><div class="mf" id="mF" style="width:0"></div></div>
+<div class="mt">匹配度 <span id="mP">0</span>%</div>
+<div class="rd" id="rD"></div>
+<div class="dims" id="dims"></div>
+<div class="tags" id="tags"></div>
+</div>
+<button class="btn" id="retryBtn" style="width:100%">再测一次</button>
+<div class="credit" style="margin-top:24px;text-align:center">本测试纯属娱乐。如有冒犯，那大概是测得准了。</div>
+</div>
+<script>
+var scores={S:0,E:0,A:0,C:0,R:0},cur=0,ans=[];
+var QS=[
+{q:"领导让你周末加班，你的第一反应？",o:[{t:"好的收到马上到",d:{S:1,E:-2,A:2}},{t:"装没看见消息，等别人先回",d:{E:1,S:-1}},{t:"直接说不行，我有安排",d:{E:2,A:1,R:1}},{t:"截图发朋友圈阴阳怪气",d:{C:2,S:1}}]},
+{q:"暗恋的人发了条朋友圈，你会？",o:[{t:"秒赞+评论+私聊三连",d:{S:2,E:-2,C:-1}},{t:"反复看十遍但什么都不做",d:{E:-1,S:-2}},{t:"假装没看见，但截图给闺蜜分析",d:{S:1,C:1}},{t:"发一条更精彩的跟TA battle",d:{C:2,A:1,S:1}}]},
+{q:"朋友聚餐AA制，有人点了龙虾但只吃了沙拉，你？",o:[{t:"算了，多的我来付吧",d:{S:1,E:-1,R:-1}},{t:"打开计算器精确到分",d:{R:3,A:1}},{t:"下次不叫TA了",d:{E:2,S:-1}},{t:"当场指出来，公平最重要",d:{A:2,R:2,S:1}}]},
+{q:"你在网上看到一个「量子纠缠解释爱情」的帖子，你？",o:[{t:"转发并加上自己的深度解读",d:{C:2,R:-2}},{t:"评论区打假，这是伪科学",d:{R:3,A:1}},{t:"看完觉得有道理就划走了",d:{E:1}},{t:"截图发给暗恋对象暗示TA",d:{S:2,E:-2,C:1}}]},
+{q:"你的另一半/好朋友忘了你的生日，你？",o:[{t:"没关系，TA平时对我挺好的",d:{E:1,S:1,R:-1}},{t:"不说但记在小本本上",d:{E:-1,R:1}},{t:"直接说：你忘了我生日",d:{A:2,E:2,S:1}},{t:"发朋友圈暗示，看TA能不能悟到",d:{C:1,S:-1,E:-1}}]},
+{q:"半夜三点你还没睡，最可能在干嘛？",o:[{t:"刷手机，一个视频接一个停不下来",d:{A:-1,C:1}},{t:"想一些有的没的，越想越清醒",d:{C:2,E:-1}},{t:"加班赶deadline",d:{A:3,R:2}},{t:"跟人聊天，深夜才是真心话时间",d:{S:2,E:-1}}]},
+{q:"你在家的状态更接近？",o:[{t:"沙发上长蘑菇，能躺绝不坐",d:{A:-2,E:2}},{t:"把家收拾得井井有条",d:{R:3,A:1}},{t:"一边做家务一边跟人视频",d:{S:2,A:1}},{t:"在家也要穿得体面，仪式感很重要",d:{C:3,R:0}}]},
+{q:"同事甩锅给你，你会？",o:[{t:"默默背了，不想起冲突",d:{E:-2,S:1,A:1}},{t:"当场怼回去，证据都在",d:{A:3,R:2,E:1}},{t:"私下找领导说清楚",d:{R:2,A:2}},{t:"表面接受，暗中收集证据等时机",d:{C:1,E:1,R:1}}]},
+{q:"你对「科学」的态度？",o:[{t:"相信数据和论文，其他都是扯淡",d:{R:3,C:-1}},{t:"科学解释不了的东西多了去了",d:{C:2,R:-2}},{t:"我有自己的一套理论体系",d:{C:3,R:-2}},{t:"跟我有什么关系，能吃吗",d:{E:2,A:-1}}]},
+{q:"你的购物车里现在最多的是？",o:[{t:"打折商品，虽然不需要但便宜啊",d:{R:1,C:1}},{t:"送给别人的礼物比自己的多",d:{S:2,E:-1}},{t:"各种课程和书，买了就等于学了",d:{C:2,A:-1}},{t:"啥都有，想到啥加啥，反正也不买",d:{E:1,R:-1}}]},
+
+
+{q:"你在感情里更像？",o:[{t:"付出型，对方开心我就开心",d:{S:2,E:-2}},{t:"独立型，谈恋爱也要有自己的空间",d:{E:2,S:-2}},{t:"掌控型，大事小事我来安排",d:{A:2,R:1}},{t:"随缘型，有没有都行",d:{E:2,C:1}}]},
+{q:"你怎么处理跟人的分歧？",o:[{t:"先道歉再说，和平最重要",d:{E:-2,S:1}},{t:"摆数据讲逻辑，用事实说话",d:{R:3,A:1}},{t:"冷处理，过几天就忘了",d:{E:2,S:-1}},{t:"写一篇小作文发给对方",d:{C:2,S:1,A:1}}]},
+{q:"你的微信头像是？",o:[{t:"自拍/精修照片",d:{S:2,C:1}},{t:"风景/动物/二次元",d:{S:-1,C:2}},{t:"默认头像或者很久没换了",d:{E:2,R:1}},{t:"跟对象/好友的情侣头像",d:{S:2,E:-1}}]},
+{q:"有人当面夸你好看，你的反应？",o:[{t:"谢谢！（内心开花）",d:{S:2,E:1}},{t:"哪有哪有，你才好看",d:{E:-1,S:1}},{t:"嗯，我知道",d:{E:2,C:1,A:1}},{t:"TA是不是有什么目的？",d:{R:2,E:-1,S:-1}}]},
+{q:"你的理想周末是？",o:[{t:"睡到下午，点外卖，继续睡",d:{A:-2,E:2}},{t:"约朋友出去浪一整天",d:{S:3,A:1}},{t:"一个人去咖啡馆看书",d:{C:2,S:-1}},{t:"把下周的事情提前安排好",d:{R:3,A:2}}]},
+{q:"你觉得婚姻是？",o:[{t:"两个人搭伙过日子",d:{R:3,E:1}},{t:"找一个能管住自己的人",d:{A:-1,E:-1,R:1}},{t:"灵魂伴侣，宁缺毋滥",d:{C:2,E:1}},{t:"不结婚也挺好的",d:{E:2,S:-1,C:1}}]},
+{q:"你的手机通知设置是？",o:[{t:"全部打开，一条都不能漏",d:{S:2,E:-2,A:1}},{t:"只开重要的几个APP",d:{R:2,E:1}},{t:"全部静音，有事打电话",d:{E:3,S:-2}},{t:"开着但从来不看",d:{E:1,A:-1}}]},
+{q:"你对养生的态度？",o:[{t:"保温杯泡枸杞，早睡早起",d:{R:2,A:1}},{t:"熬最晚的夜，敷最贵的面膜",d:{C:1,E:-1}},{t:"我有自己研究的一套养生理论",d:{C:2,R:-2}},{t:"活着就是养生",d:{E:2,A:-1}}]},
+{q:"你最怕听到哪句话？",o:[{t:"你太敏感了",d:{E:-2,C:1}},{t:"这个事情交给你了",d:{A:-1,E:-1,R:1}},{t:"我们需要谈谈",d:{S:-1,E:-2}},{t:"随便都行你定",d:{A:2,R:1,C:-1}}]},
+{q:"你的社交媒体人设是？",o:[{t:"岁月静好文艺青年",d:{C:3,S:0}},{t:"搞笑博主段子手",d:{S:3,C:2}},{t:"从不发动态的神秘人",d:{S:-3,E:2}},{t:"转发各种科普和辟谣",d:{R:2,C:1}}]},
+{q:"你做饭的水平？",o:[{t:"能把厨房炸了的那种",d:{C:1,A:-1}},{t:"会做但懒得做",d:{E:2,A:-1}},{t:"厨艺不错，经常做给别人吃",d:{S:2,A:1}},{t:"精通各种菜系，朋友圈美食博主",d:{C:3,R:0}}]},
+{q:"你对另一半的手机态度？",o:[{t:"完全信任，从不看",d:{E:2,R:1}},{t:"偶尔瞄一眼，人之常情",d:{S:1,E:-1}},{t:"密码我都知道，TA也知道我的",d:{S:2,A:1}},{t:"TA的手机就是我的手机",d:{A:2,E:-1,R:1}}]},
+{q:"你在家里谁说了算？",o:[{t:"当然是我",d:{A:3,E:1}},{t:"表面上TA说了算，实际上是我",d:{C:2,A:1}},{t:"谁有道理听谁的",d:{R:2,E:1}},{t:"都听对方的，TA开心就好",d:{S:2,E:-2}}]},
+{q:"你对网上的热门理论（星座/MBTI/玄学）？",o:[{t:"深信不疑，每天看运势",d:{C:1,R:-2}},{t:"娱乐一下，不当真",d:{E:2,C:1}},{t:"这都是伪科学，我有更靠谱的理论",d:{R:1,C:2}},{t:"我自己就能发明一套新理论",d:{C:3,R:-2}}]},
+{q:"你的存款状况？",o:[{t:"月光，花呗还没还完",d:{R:-2,C:1}},{t:"有一点点，但不敢看",d:{E:-1,R:1}},{t:"稳步增长，有理财计划",d:{R:3,A:2}},{t:"存款是什么？我只有负债",d:{A:-1,E:1,R:-2}}]},
+{q:"你被误解的时候会？",o:[{t:"拼命解释，直到对方理解",d:{S:2,E:-2,A:1}},{t:"懒得解释，信不信随你",d:{E:3,S:-1}},{t:"写一篇长文把事情说清楚",d:{C:2,A:1}},{t:"默默难过，但不说",d:{E:-2,S:-1}}]},
+{q:"你觉得自己最大的缺点是？",o:[{t:"太善良，容易被人利用",d:{S:1,E:-2}},{t:"太懒，有想法但不行动",d:{A:-2,C:1}},{t:"太较真，什么都要争个对错",d:{R:2,A:2}},{t:"太敏感，别人一句话能想三天",d:{E:-2,C:2}}]},
+{q:"如果你是一种动物？",o:[{t:"狗——忠诚热情，谁对我好我就跟谁",d:{S:2,E:-1}},{t:"猫——独立高冷，但偶尔也撒娇",d:{E:2,S:-1,C:1}},{t:"狼——独来独往，但有自己的领地",d:{A:2,E:2,S:-2}},{t:"鹦鹉——话多，什么都能聊两句",d:{S:3,C:1}}]},
+{q:"你对这个测试的真实想法？",o:[{t:"有被冒犯到，但确实有点准",d:{E:-1,R:1}},{t:"纯属扯淡，但我要截图发朋友圈",d:{S:2,C:2}},{t:"题目设计不够科学，我来改改",d:{R:2,C:2}},{t:"无所谓，我就是来凑热闹的",d:{E:2,A:-1}}]},
+{q:"最后：你觉得自己是个怎样的人？",o:[{t:"表面坚强，内心柔软",d:{E:-1,S:1}},{t:"表面随和，内心有主见",d:{E:2,A:1}},{t:"表面正常，内心疯狂",d:{C:3,E:1}},{t:"表里如一，我就是我",d:{R:2,E:2,A:1}}]}
+];
+
+var TYPES=[
+{code:"CTRL",name:"职场被PUA大师",emoji:"🐶",desc:"你是那种被领导骂完还说谢谢的人。加班到凌晨你觉得是自己不够努力，被甩锅你觉得是自己没做好。你的口头禅是「好的收到马上改」，你的内心OS是「我是不是真的很差」。你不是没脾气，你是把脾气全用在骂自己上了。醒醒吧，问题不在你。",dims:{S:1,E:-2,A:2,C:0,R:2},tags:["职场受气包","自我PUA专家","好的收到马上改"]},
+{code:"SOFA",name:"沙发长出来的蘑菇",emoji:"🍄",desc:"你和沙发之间的关系已经不是坐和被坐的关系了，你们是共生体。你的人生巅峰是找到了一个完美的躺姿，你的运动极限是翻个身拿遥控器。别人说你懒，你说你在修炼「无为而治」。你不是不努力，你是在等一个值得你站起来的理由——目前还没等到。",dims:{S:-1,E:3,A:-2,C:2,R:0},tags:["沙发寄生虫","躺平界扛把子","站起来算加班"]},
+{code:"WIRE",name:"社交牛逼症晚期",emoji:"🔌",desc:"你能在电梯里跟陌生人聊出童年阴影，能在超市排队时交到新朋友。你的微信好友列表比电话黄页还厚，但你叫得出名字的不超过20%。你不是真的喜欢社交，你是害怕安静——因为安静的时候你会开始想一些不该想的事。",dims:{S:3,E:0,A:2,C:1,R:1},tags:["话痨本痨","自来熟终结者","热闹是我的止痛药"]},
+{code:"VOID",name:"精神世界的房东",emoji:"👻",desc:"你的肉体在上班，灵魂在神游。别人跟你说话你在想平行宇宙，开会的时候你在脑内写小说。你不是高冷，你是真的没听见。你的朋友圈永远是空的，不是因为你没有生活，是因为你觉得发朋友圈这件事本身就很荒谬。",dims:{S:-3,E:2,A:0,C:3,R:-1},tags:["灵魂出窍常客","已读不回艺术家","活在自己的频道"]},
+{code:"GRND",name:"人间扫地僧",emoji:"🧹",desc:"你是那种默默干活、从不邀功的人。别人升职加薪靠PPT，你靠的是真本事。你的靠谱程度已经到了让人觉得理所当然的地步——出事找你，没事忘你。你的悲剧是：你太稳了，稳到没人觉得你需要被关心。",dims:{S:1,E:1,A:2,C:-1,R:3},tags:["默默扛事的工具人","靠谱到被忽略","稳如老狗"]},
+{code:"GLCH",name:"行走的bug",emoji:"🐛",desc:"你的人生就是一个不断触发隐藏剧情的过程。别人走大路你钻小巷，别人用正门你翻窗户。你不是故意要与众不同，你是真的不知道正常路怎么走。你的存在让强迫症患者血压飙升，但不得不承认——你偶尔能发现别人永远发现不了的东西。",dims:{S:1,E:1,A:1,C:3,R:-2},tags:["非正常人类","bug即feature","混乱中立"]},
+{code:"TANK",name:"人形灭火器",emoji:"🧊",desc:"别人着火你灭火，别人崩溃你递纸巾，别人emo你说「想开点」。你的情绪稳定到让人怀疑你是不是机器人。但其实你不是没有情绪，你只是把情绪锁在了一个连你自己都找不到钥匙的保险箱里。有一天它会爆炸的，希望那天你身边有人。",dims:{S:0,E:3,A:2,C:0,R:2},tags:["情绪黑洞","冷静到吓人","迟早要爆"]},
+{code:"FOMO",name:"信息松鼠症",emoji:"🐿️",desc:"你的手机屏幕使用时间是别人的三倍。你关注了800个公众号，收藏了2000篇文章，实际看完的不到5篇。你最怕的不是错过机会，而是错过别人在讨论什么。你的焦虑来源不是做不到，而是不知道别人在做什么。放下手机吧，世界没你想的那么精彩。",dims:{S:2,E:-2,A:2,C:1,R:0},tags:["收藏从未停止","阅读从未开始","焦虑永动机"]},
+];
+
+
+TYPES.push(
+{code:"SAGE",name:"民间哲学博主",emoji:"🧠",desc:"你在厕所里想出的道理比苏格拉底一辈子都多。你的朋友圈签名换过47次，每次都觉得这次是终极真理。你不是在思考人生，你是在用思考人生来逃避人生。",dims:{S:-1,E:1,A:0,C:3,R:1},tags:["厕所哲学家","悟了又没完全悟","想太多做太少"]},
+{code:"HACK",name:"野路子之王",emoji:"🦝",desc:"你是那种用牙签修好电脑的人。你的解决方案永远不在教科书上，但偏偏就是管用。你的代码能跑但没人看得懂，你活成了一个都市传说：不知道怎么做到的，但就是做到了。",dims:{S:0,E:1,A:3,C:2,R:2},tags:["歪门邪道专家","能跑就行","玄学选手"]},
+{code:"BEAR",name:"人形创可贴",emoji:"🩹",desc:"你是朋友圈里的免费心理咨询师。谁失恋找你，谁吵架找你，谁半夜emo还是找你。你的情绪垃圾桶已经溢出来了但你还在说没事我还能装。求求你了，先照顾一下自己吧。",dims:{S:2,E:1,A:1,C:0,R:1},tags:["情绪垃圾桶","烂好人","自己的伤自己舔"]},
+{code:"NERD",name:"人形计算器",emoji:"🤖",desc:"你买个奶茶都要算性价比，约会选餐厅要看评分精确到小数点后两位。你的Excel表格比你的感情生活丰富一万倍。你不是不浪漫，你是觉得浪漫的ROI太低了。",dims:{S:-2,E:1,A:2,C:1,R:3},tags:["理性到没朋友","Excel比对象亲","浪漫绝缘体"]},
+{code:"YOLO",name:"月光族形象大使",emoji:"💸",desc:"你的银行卡余额和你的发际线一样——越来越少。你坚信钱是赚来花的，但你忘了你赚的没有花的多。你不是不会存钱，你是觉得快乐不能等，但账单可以。",dims:{S:2,E:2,A:1,C:2,R:-2},tags:["花呗战士","今朝有酒今朝醉","下个月再说"]},
+{code:"WALL",name:"人际关系防盗门",emoji:"🚪",desc:"你的内心是一个需要三道密码加指纹识别才能进入的保险库。你不是社恐，你是社交选择困难——不是不想交朋友，是觉得大多数人不值得你打开那扇门。",dims:{S:-1,E:3,A:1,C:0,R:2},tags:["三重门禁","精选好友","孤独美食家"]}
+);
+TYPES.push(
+{code:"CHEF",name:"朋友圈摄影大赛冠军",emoji:"📸",desc:"你吃饭前的仪式不是洗手，是找角度。你的手机内存80%是食物照片，15%是自拍，5%是正经事。你不是在生活，你是在策展。",dims:{S:1,E:1,A:1,C:3,R:0},tags:["万物皆可拍","滤镜依赖症","精致到累"]},
+{code:"WOLF",name:"单机版人类",emoji:"🎮",desc:"你的人生是单机游戏，不联网，不组队，不开语音。你一个人吃火锅看电影搬家，你觉得这不是孤独，这是效率。但有些关卡，是需要队友的。",dims:{S:-2,E:2,A:3,C:1,R:2},tags:["单机玩家","独来独往","效率至上但有点寂寞"]},
+{code:"MEME",name:"人间开心果（过期的）",emoji:"🤡",desc:"你是朋友圈里最搞笑的人，也是深夜最安静的人。你用幽默武装自己，用段子化解尴尬。大家都觉得你没心没肺，只有你知道——笑着笑着，有时候是真的想哭。",dims:{S:3,E:0,A:1,C:3,R:-1},tags:["快乐搬运工","笑着活下去","小丑竟是我自己"]},
+{code:"OWL",name:"凌晨三点的王者",emoji:"🌙",desc:"白天的你是个废物，晚上的你是个天才。你的灵感全在凌晨两点到来，你的黑眼圈已经深到可以当眼影用了。你不是不想早睡，你是觉得夜晚才是属于你的时间。",dims:{S:-1,E:0,A:1,C:2,R:-1},tags:["夜猫子本猫","白天植物人","黑眼圈代言人"]},
+{code:"GPS",name:"人生Excel表格",emoji:"📊",desc:"你的五年计划比国家发改委还详细。你的日程表精确到分钟，你的自律让人窒息。但你有没有想过——人生最美的风景，往往在计划之外？偶尔迷路一下，天不会塌。",dims:{S:0,E:2,A:3,C:0,R:3},tags:["计划狂魔","自律到变态","偶尔也该放飞"]},
+{code:"RAIN",name:"行走的文艺片",emoji:"🎬",desc:"你走路自带慢镜头，喝咖啡自带BGM，下雨天自带滤镜。你的感受力强到像是装了情绪放大器——别人觉得是微风，你觉得是命运的叹息。你不是矫情，你是真的活在4K HDR的世界里，而别人还在看480P。",dims:{S:0,E:-1,A:0,C:3,R:-1},tags:["自带BGM","情绪4K","矫情但真诚"]}
+);
+
+TYPES.push(
+{code:"SIMP",name:"可怜的汤姆",emoji:"🐕",desc:"你的微信置顶永远是那个不回你消息的人。你把「在吗」发了三遍，对方回了一个「嗯」你能开心一整天。你的付出感动了所有人，除了你喜欢的那个人。你不是不知道自己在舔，你是觉得——万一呢？没有万一，醒醒。",dims:{S:2,E:-2,A:1,C:-1,R:-2},tags:["舔到最后一无所有","在吗在吗在吗","卑微恋爱脑"]},
+{code:"QUAK",name:"野鸡科学家",emoji:"🔬",desc:"你对一切都有自己的「理论」，虽然这些理论的来源是抖音、知乎和你姥姥。你能用量子力学解释为什么今天运气不好，用博弈论分析为什么食堂阿姨给你打饭少。你的知识面广到一厘米深，你的自信心大到能填满太平洋。你不是民科，你是民科里的爱因斯坦。",dims:{S:1,E:1,A:1,C:2,R:-2},tags:["民间科学家","啥都懂一点","自信心过剩"]}
+);
+
+TYPES.push(
+{code:"WLFE",name:"狼妻",emoji:"🐺",desc:"你表面温柔贤惠，内心住着一匹饿了三天的狼。你在外面是人畜无害的小白兔，回到家是掌控一切的女王。你老公以为他是一家之主，其实他只是你养的另一只宠物。你的厨艺好到让人离不开你，你的脾气大到让人不敢离开你。你不是在经营婚姻，你是在经营一个你说了算的小型独裁国家。",dims:{S:2,E:2,A:2,C:1,R:2},tags:["温柔暴君","家庭CEO","表面小白兔内心大灰狼"]}
+);
+
+var DN={S:"社交能量",E:"情绪稳定",A:"行动力",C:"创造力",R:"现实感"};
+var DC={S:"#4fc3f7",E:"#81c784",A:"#ffb74d",C:"#ba68c8",R:"#e57373"};
+function show(id){document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active")});document.getElementById(id).classList.add("active")}
+function render(){
+var q=QS[cur];
+document.getElementById("qn").textContent=cur+1;
+document.getElementById("qtx").textContent=q.q;
+document.getElementById("pb").style.width=(cur/30*100)+"%";
+var box=document.getElementById("qo");
+box.innerHTML="";
+q.o.forEach(function(opt,i){
+var b=document.createElement("button");
+b.className="ob";b.textContent=opt.t;
+b.onclick=function(){pick(i)};
+box.appendChild(b);
+});
+window.scrollTo(0,0);
+document.getElementById("backBtn").style.display=cur>0?"inline-block":"none";
+}
+function pick(i){
+var d=QS[cur].o[i].d;
+ans.push({idx:cur,d:d});
+for(var k in d)scores[k]=(scores[k]||0)+d[k];
+cur++;
+if(cur>=30)finish();else render();
+}
+function finish(){
+document.getElementById("pb").style.width="100%";
+var best=null,bs=-999;
+TYPES.forEach(function(t){
+var dot=0,mA=0,mB=0;
+for(var k in DN){var a=scores[k]||0,b=t.dims[k]||0;dot+=a*b;mA+=a*a;mB+=b*b}
+mA=Math.sqrt(mA);mB=Math.sqrt(mB);
+var sim=(mA&&mB)?(dot/(mA*mB)):0;
+if(sim>bs){bs=sim;best=t}
+});
+var pct=Math.round(65+bs*33);
+if(pct>98)pct=98;if(pct<65)pct=65;
+showResult(best,pct);
+}
+function showResult(t,pct){
+show("result");
+document.getElementById("rE").textContent=t.emoji;
+document.getElementById("rT").textContent=t.code;
+document.getElementById("rN").textContent="("+t.name+")";
+document.getElementById("rD").textContent=t.desc;
+document.getElementById("mP").textContent=pct;
+setTimeout(function(){document.getElementById("mF").style.width=pct+"%"},200);
+var dh=document.getElementById("dims");
+dh.innerHTML="<h3>五维雷达</h3>";
+["S","E","A","C","R"].forEach(function(k){
+var v=scores[k]||0;
+var pv=Math.round(Math.min(100,Math.max(0,(v+10)/20*100)));
+var row=document.createElement("div");row.className="dr";
+row.innerHTML="<div class=dl>"+DN[k]+"</div><div class=db><div class=df style=\"width:0;background:"+DC[k]+"\"></div></div><div class=dv>"+pv+"</div>";
+dh.appendChild(row);
+setTimeout(function(){row.querySelector(".df").style.width=pv+"%"},400);
+});
+var tg=document.getElementById("tags");tg.innerHTML="";
+(t.tags||[]).forEach(function(l){var s=document.createElement("span");s.className="tag";s.textContent="#"+l;tg.appendChild(s)});
+}
+document.getElementById("startBtn").onclick=function(){show("quiz");render()};
+document.getElementById("retryBtn").onclick=function(){location.reload()};
+document.getElementById("backBtn").onclick=function(){
+if(cur<=0)return;
+var last=ans.pop();
+var d=last.d;
+for(var k in d)scores[k]=(scores[k]||0)-d[k];
+cur=last.idx;
+render();
+};
+</script>
+</body>
+</html>
